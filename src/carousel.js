@@ -231,6 +231,31 @@ const Carousel = createReactClass({
 
   touchObject: {},
 
+  /**
+   * Swap page x and y when screen orientation is portrait.
+   * Method:
+   * pageX = pageY
+   * pageY = -pageX
+   * @param e
+   * @returns {[{pageY, pageX}]}
+   */
+  getTouches(e) {
+    const isPortrait = window.matchMedia('(orientation: portrait)').matches;
+    const touches = [
+      {
+        pageX: e.touches[0].pageX,
+        pageY: e.touches[0].pageY,
+      },
+    ];
+    if (isPortrait) {
+      [touches[0].pageX, touches[0].pageY] = [
+        touches[0].pageY,
+        -touches[0].pageX,
+      ];
+    }
+    return touches;
+  },
+
   getTouchEvents() {
     var self = this;
 
@@ -240,19 +265,20 @@ const Carousel = createReactClass({
 
     return {
       onTouchStart(e) {
+        const touches = self.getTouches(e);
         self.touchObject = {
-          startX: e.touches[0].pageX,
-          startY: e.touches[0].pageY,
+          startX: touches[0].pageX,
+          startY: touches[0].pageY,
         };
-        console.log(self.touchObject);
         self.handleMouseOver();
       },
       onTouchMove(e) {
+        const touches = self.getTouches(e);
         var direction = self.swipeDirection(
           self.touchObject.startX,
-          e.touches[0].pageX,
+          touches[0].pageX,
           self.touchObject.startY,
-          e.touches[0].pageY
+          touches[0].pageY
         );
 
         if (direction !== 0) {
@@ -261,24 +287,21 @@ const Carousel = createReactClass({
 
         var length = self.props.vertical
           ? Math.round(
-              Math.sqrt(
-                Math.pow(e.touches[0].pageY - self.touchObject.startY, 2)
-              )
+              Math.sqrt(Math.pow(touches[0].pageY - self.touchObject.startY, 2))
             )
           : Math.round(
-              Math.sqrt(
-                Math.pow(e.touches[0].pageX - self.touchObject.startX, 2)
-              )
+              Math.sqrt(Math.pow(touches[0].pageX - self.touchObject.startX, 2))
             );
 
         self.touchObject = {
           startX: self.touchObject.startX,
           startY: self.touchObject.startY,
-          endX: e.touches[0].pageX,
-          endY: e.touches[0].pageY,
+          endX: touches[0].pageX,
+          endY: touches[0].pageY,
           length: length,
           direction: direction,
         };
+        console.log(self.touchObject, e.touches[0]);
 
         self.setState({
           left: self.props.vertical

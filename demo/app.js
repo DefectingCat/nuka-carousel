@@ -16,7 +16,7 @@ const App = createReactClass({
 
   render() {
     return (
-      <div style={{ width: '50%', margin: 'auto' }}>
+      <div className="force_landscape">
         <Carousel
           ref="carousel"
           data={this.setCarouselData.bind(this, 'carousel')}
@@ -24,6 +24,7 @@ const App = createReactClass({
           afterSlide={(newSlideIndex) =>
             this.setState({ slideIndex: newSlideIndex })
           }
+          decorators={[]}
         >
           <img src="https://via.placeholder.com/1000x400&text=slide1" />
           <img src="https://via.placeholder.com/1000x400&text=slide2" />
